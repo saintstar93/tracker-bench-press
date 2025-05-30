@@ -555,6 +555,34 @@
                     </div>
                     
                     <div class="card">
+                        <h2>⚡ Generatore Programma di Forza</h2>
+                        <form id="strength-program-form" onsubmit="event.preventDefault(); generateStrengthProgramPrompt();" style="margin-bottom: 12px;">
+                            <div style="margin-bottom:8px;">
+                                <label for="strength-max-input" style="font-weight:500;">Massimale attuale (kg):</label>
+                                <input type="number" id="strength-max-input" style="width:100px; margin-left:10px;" min="1" required>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <label for="strength-frequency-input" style="font-weight:500;">Allenamenti a settimana:</label>
+                                <select id="strength-frequency-input" style="margin-left:10px;">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <label for="strength-level-input" style="font-weight:500;">Livello:</label>
+                                <select id="strength-level-input" style="margin-left:10px;">
+                                    <option value="principiante">Principiante</option>
+                                    <option value="intermedio">Intermedio</option>
+                                    <option value="avanzato">Avanzato</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-blue" type="submit">Genera Programma</button>
+                        </form>
+                        <div id="strength-program-table"></div>
+                    </div>
+                    
+                    <div class="card">
                         <h2>Massimale Attuale</h2>
                         <div class="max-test">
                             <input type="number" id="max-input" placeholder="Inserisci il massimale">
@@ -1401,6 +1429,81 @@
                 document.getElementById('app-root').style.display = 'none';
             }
         });
+        
+        // --- GENERATORE PROGRAMMA DI FORZA CON PROMPT ---
+        function generateStrengthProgramPrompt() {
+            const maxInput = document.getElementById('strength-max-input');
+            const freqInput = document.getElementById('strength-frequency-input');
+            const levelInput = document.getElementById('strength-level-input');
+            let max = parseFloat(maxInput.value);
+            let frequency = parseInt(freqInput.value);
+            let level = levelInput.value;
+            // Se non inserito, prova a prendere il massimale più recente
+            if (!max) {
+                const maxTests = data[currentExercise].maxTests;
+                if (maxTests && maxTests.length > 0) {
+                    max = maxTests[0].weight;
+                    maxInput.value = max;
+                } else {
+                    alert('Inserisci prima un massimale!');
+                    return;
+                }
+            }
+            // Progressione base (puoi personalizzare in futuro)
+            let progression = [
+                { week: 1, percent: 0.7, sets: 5, reps: 5 },
+                { week: 2, percent: 0.75, sets: 5, reps: 4 },
+                { week: 3, percent: 0.8, sets: 5, reps: 3 },
+                { week: 4, percent: 0.85, sets: 4, reps: 3 },
+                { week: 5, percent: 0.9, sets: 3, reps: 2 },
+                { week: 6, percent: 0.95, sets: 2, reps: 1 },
+            ];
+            // Personalizzazione base: più avanzato = più volume/serie
+            if (level === 'intermedio') {
+                progression = progression.map(p => ({...p, sets: p.sets + 1 }));
+            } else if (level === 'avanzato') {
+                progression = progression.map(p => ({...p, sets: p.sets + 2 }));
+            }
+            // Frequenza: se >1, suggerisci di dividere il volume su più giorni
+            let freqNote = '';
+            if (frequency > 1) {
+                freqNote = `<div style='margin:8px 0; color:#2563eb; font-size:14px;'>Dividi il volume settimanale su ${frequency} allenamenti (${Math.ceil(progression[0].sets/frequency)}-${Math.ceil(progression[progression.length-1].sets/frequency)} serie a seduta).</div>`;
+            }
+            let html = freqNote + '<table style="width:100%; border-collapse:collapse; margin-top:10px;">';
+            html += '<tr style="background:#f3f4f6;"><th>Settimana</th><th>%RM</th><th>Carico (kg)</th><th>Serie x Ripetizioni</th></tr>';
+            progression.forEach(step => {
+                const weight = Math.round(max * step.percent);
+                html += `<tr style="text-align:center; border-bottom:1px solid #e5e7eb;">
+                    <td>${step.week}</td>
+                    <td>${(step.percent*100).toFixed(0)}%</td>
+                    <td>${weight}</td>
+                    <td>${step.sets} x ${step.reps}</td>
+                </tr>`;
+            });
+            html += `<tr style="background:#f9fafb; font-weight:600; text-align:center;"><td colspan="4">Settimana 7: Testa il nuovo massimale!</td></tr>`;
+            html += '</table>';
+            document.getElementById('strength-program-table').innerHTML = html;
+        }
+        // Precompila il massimale se disponibile quando cambi esercizio
+        function updateStrengthMaxInput() {
+            const maxInput = document.getElementById('strength-max-input');
+            if (!maxInput) return;
+            const maxTests = data[currentExercise].maxTests;
+            if (maxTests && maxTests.length > 0) {
+                maxInput.value = maxTests[0].weight;
+            } else {
+                maxInput.value = '';
+            }
+            document.getElementById('strength-program-table').innerHTML = '';
+        }
+        // Aggiorna anche quando cambi esercizio
+        const oldSelectExercise = selectExercise;
+        selectExercise = function(exercise) {
+            oldSelectExercise(exercise);
+            updateStrengthMaxInput();
+        }
+        // All'avvio, precompila
+        window.addEventListener('DOMContentLoaded', updateStrengthMaxInput);
         
         // Avvia l'app
         init();
