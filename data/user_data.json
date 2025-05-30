@@ -1,0 +1,37 @@
+{
+    "users": {
+        "default": {
+            "lastUpdate": "2025-05-29 15:51:59",
+            "data": {
+                "Panca": {
+                    "maxTests": [],
+                    "sessions": [],
+                    "notes": "",
+                    "complementary": [],
+                    "videoData": null
+                },
+                "Stacco": {
+                    "maxTests": [],
+                    "sessions": [],
+                    "notes": "",
+                    "complementary": [],
+                    "videoData": null
+                },
+                "Squat": {
+                    "maxTests": [],
+                    "sessions": [],
+                    "notes": "",
+                    "complementary": [],
+                    "videoData": null
+                },
+                "Military Press": {
+                    "maxTests": [],
+                    "sessions": [],
+                    "notes": "",
+                    "complementary": [],
+                    "videoData": null
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strength Training Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .backup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .btn-green {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-green:hover {
+            background-color: #059669;
+        }
+        
+        .btn-blue {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-red {
+            background-color: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-red:hover {
+            background-color: #dc2626;
+        }
+        
+        .exercise-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: white;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .tab:hover {
+            background-color: #f9fafb;
+        }
+        
+        .tab.active {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        input[type="number"],
+        input[type="date"],
+        input[type="text"],
+        textarea {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .recap-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .recap-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recap-label {
+            color: #6b7280;
+        }
+        
+        .recap-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .session-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .session-item {
+            background-color: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-date {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .session-details {
+            font-weight: 600;
+            color: #1f2937;
+            margin-top: 4px;
+        }
+        
+        .delete-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+        
+        .complementary-list {
+            margin-top: 16px;
+        }
+        
+        .complementary-item {
+            background-color: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .complementary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .complementary-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .complementary-details {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #chart {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .video-section {
+            background-color: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            margin-bottom: 15px;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .video-upload {
+            margin-top: 15px;
+        }
+        
+        .max-test {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .max-history {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .max-item {
+            background-color: #f9fafb;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .max-date {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .max-weight {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .complementary-form {
+            background-color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .complementary-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .admin-section {
+            background-color: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        .admin-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .admin-input input {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .complementary-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .max-test {
+                flex-direction: column;
+            }
+        }
+        
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: #fff;
+            padding: 32px 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: stretch;
+        }
+        .login-box input {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .login-box button {
+            margin-top: 8px;
+        }
+        
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-container input {
+            flex: 1;
+            padding-right: 40px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            color: #6b7280;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-password:hover {
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-overlay" class="login-overlay">
+        <form class="login-box" onsubmit="login(event)">
+            <h2 style="text-align:center; color:#1f2937;">Accedi</h2>
+            <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+            <div class="password-container">
+                <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
+            </div>
+            <button class="btn btn-blue" type="submit">Login</button>
+            <div id="login-error" style="color:#ef4444; text-align:center; display:none;">Credenziali errate</div>
+        </form>
+    </div>
+    <div id="app-root" style="display:none;">
+        <div class="container">
+            <h1>💪 Strength Training Tracker</h1>
+            
+            <div id="storage-status" style="text-align: center; margin-bottom: 20px; font-size: 14px; color: #6b7280;"></div>
+            
+            <div class="backup-buttons">
+                <button class="btn btn-green" onclick="exportData()">
+                    📥 Esporta Backup
+                </button>
+                <label class="btn btn-blue">
+                    📤 Importa Backup
+                    <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                </label>
+                <button class="btn btn-blue" onclick="toggleAdmin()">
+                    ⚙️ Admin
+                </button>
+            </div>
+            
+            <div class="admin-section" id="admin-section">
+                <h2>⚙️ Gestione Video Tutorial</h2>
+                <div class="admin-input">
+                    <input type="text" id="admin-password" placeholder="Password admin" style="width: 200px;">
+                    <button class="btn btn-blue" onclick="checkAdminPassword()">Accedi</button>
+                    <button class="btn btn-red" onclick="logout()" style="margin-left:auto;">Logout</button>
+                </div>
+                <div id="video-management" style="display: none;">
+                    <div class="admin-input">
+                        <label>Panca:</label>
+                        <input type="text" id="video-panca" placeholder="URL video YouTube">
+                        <button class="btn btn-green" onclick="saveVideoUrl('Panca')">Salva</button>
+                    </div>
+                    <div class="admin-input">
+                        <label>Stacco:</label>
+                        <input type="text" id="video-stacco" placeholder="URL video YouTube">
+                        <button class="btn btn-green" onclick="saveVideoUrl('Stacco')">Salva</button>
+                    </div>
+                    <div class="admin-input">
+                        <label>Squat:</label>
+                        <input type="text" id="video-squat" placeholder="URL video YouTube">
+                        <button class="btn btn-green" onclick="saveVideoUrl('Squat')">Salva</button>
+                    </div>
+                    <div class="admin-input">
+                        <label>Military Press:</label>
+                        <input type="text" id="video-military" placeholder="URL video YouTube">
+                        <button class="btn btn-green" onclick="saveVideoUrl('Military Press')">Salva</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise-tabs">
+                <button class="tab active" onclick="selectExercise('Panca')">Panca</button>
+                <button class="tab" onclick="selectExercise('Stacco')">Stacco</button>
+                <button class="tab" onclick="selectExercise('Squat')">Squat</button>
+                <button class="tab" onclick="selectExercise('Military Press')">Military Press</button>
+            </div>
+            
+            <div class="grid">
+                <div class="column">
+                    <div class="card">
+                        <h2>🎥 Tutorial Esecuzione Corretta</h2>
+                        <div class="video-section">
+                            <div class="video-container">
+                                <iframe id="exercise-video" 
+                                        width="100%" 
+                                        height="100%" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                        <p id="exercise-description" style="text-align: center; color: #374151; font-weight: 500; margin: 10px 0;">
+                            Mantieni scapole addotte, piedi ben piantati a terra, presa 1.5x larghezza spalle
+                        </p>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>Massimale Attuale</h2>
+                        <div class="max-test">
+                            <input type="number" id="max-input" placeholder="Inserisci il massimale">
+                            <span style="font-weight: 600; color: #6b7280;">kg</span>
+                            <input type="date" id="max-date" value="">
+                            <button class="btn btn-blue" onclick="addMaxTest()">Salva Test</button>
+                        </div>
+                        <div class="max-history" id="max-history">
+                            <h3 style="font-size: 16px; margin-top: 20px; margin-bottom: 10px;">Storico Test Massimali</h3>
+                            <div id="max-list"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>Nuova Sessione</h2>
+                        <input type="date" id="session-date" style="margin-bottom: 16px;">
+                        <div class="input-row">
+                            <input type="number" id="session-weight" placeholder="Peso (kg)">
+                            <input type="number" id="session-sets" placeholder="Serie">
+                            <input type="number" id="session-reps" placeholder="Reps">
+                        </div>
+                        <button class="btn btn-blue" onclick="addSession()" style="width: 100%;">
+                            Aggiungi Sessione
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>📊 Recap Situazione</h2>
+                        <div class="recap-item">
+                            <span class="recap-label">Sessioni totali:</span>
+                            <span class="recap-value" id="total-sessions">0</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Ultimo allenamento:</span>
+                            <span class="recap-value" id="last-session">N/A</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Volume medio:</span>
+                            <span class="recap-value" id="avg-volume">0 kg</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Peso massimo usato:</span>
+                            <span class="recap-value" id="max-weight">0 kg</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">% del massimale attuale:</span>
+                            <span class="recap-value" id="max-percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column">
+                    <div class="card">
+                        <h2>📅 Storico Sessioni</h2>
+                        <div class="session-list" id="session-list">
+                            <p style="text-align: center; color: #6b7280;">Nessuna sessione registrata</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>📝 Note</h2>
+                        <textarea id="notes" placeholder="Aggiungi note su forma, sensazioni, problemi..." onchange="updateNotes()"></textarea>
+                    </div>
+                    
+                    <div class="card" id="chart-card">
+                        <h2>📈 Andamento Forza nel Tempo</h2>
+                        <canvas id="chart"></canvas>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>🎯 Esercizi Complementari</h2>
+                        <div class="complementary-form">
+                            <div class="complementary-inputs">
+                                <input type="text" id="complementary-name" placeholder="Nome esercizio">
+                                <input type="number" id="complementary-sets" placeholder="Serie">
+                                <input type="number" id="complementary-reps" placeholder="Reps">
+                            </div>
+                            <button class="btn btn-green" onclick="addComplementary()" style="width: 100%;">
+                                Aggiungi Esercizio
+                            </button>
+                        </div>
+                        <div class="complementary-list" id="complementary-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Stato dell'applicazione
+        let currentExercise = 'Panca';
+        let data = {
+            'Panca': { 
+                maxTests: [], 
+                sessions: [], 
+                notes: '', 
+                complementary: [],
+                videoData: null
+            },
+            'Stacco': { 
+                maxTests: [], 
+                sessions: [], 
+                notes: '', 
+                complementary: [],
+                videoData: null
+            },
+            'Squat': { 
+                maxTests: [], 
+                sessions: [], 
+                notes: '', 
+                complementary: [],
+                videoData: null
+            },
+            'Military Press': { 
+                maxTests: [], 
+                sessions: [], 
+                notes: '', 
+                complementary: [],
+                videoData: null
+            }
+        };
+        
+        // Variabile per tracciare se localStorage è disponibile
+        let storageAvailable = false;
+        
+        // Test localStorage availability
+        function testLocalStorage() {
+            try {
+                const test = '__localStorage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+        
+        // Descrizioni tecniche per ogni esercizio
+        const exerciseDescriptions = {
+            'Panca': 'Mantieni scapole addotte, piedi ben piantati a terra, presa 1.5x larghezza spalle',
+            'Stacco': 'Schiena neutra, petto in fuori, spinta dai talloni, barra vicina al corpo',
+            'Squat': 'Scendi sotto il parallelo, ginocchia in linea con le punte, core attivo',
+            'Military Press': 'Core contratto, gomiti sotto la barra, spinta verticale sopra la testa'
+        };
+
+        // Video tutorial per ogni esercizio
+        let exerciseVideos = {
+            'Panca': 'https://www.youtube.com/embed/4Y2ZdHCOXok',
+            'Stacco': 'https://www.youtube.com/embed/op9kVnSso6Q',
+            'Squat': 'https://www.youtube.com/embed/ultWZbUMPL8',
+            'Military Press': 'https://www.youtube.com/embed/2yjwXTZQDDI'
+        };
+        
+        // Inizializzazione
+        function init() {
+            // Test se localStorage è disponibile
+            storageAvailable = testLocalStorage();
+            
+            if (storageAvailable) {
+                try {
+                    const saved = localStorage.getItem('strengthData');
+                    if (saved) {
+                        const parsedData = JSON.parse(saved);
+                        // Migrazione dati vecchi se necessario
+                        migrateOldData(parsedData);
+                        console.log('Dati caricati con successo');
+                    }
+                    showStorageStatus();
+                } catch (e) {
+                    console.log('Errore nel caricamento dati:', e);
+                    showStorageWarning();
+                }
+            } else {
+                console.log('LocalStorage non disponibile - i dati non verranno salvati permanentemente');
+                showStorageWarning();
+            }
+            
+            // Imposta data di oggi
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('session-date').value = today;
+            document.getElementById('max-date').value = today;
+            
+            updateUI();
+        }
+        
+        // Migrazione dati vecchi
+        function migrateOldData(oldData) {
+            for (let exercise in oldData) {
+                if (oldData[exercise].max !== undefined) {
+                    // Converti vecchio formato
+                    data[exercise] = {
+                        maxTests: oldData[exercise].max > 0 ? [{
+                            weight: oldData[exercise].max,
+                            date: new Date().toISOString().split('T')[0]
+                        }] : [],
+                        sessions: oldData[exercise].sessions || [],
+                        notes: oldData[exercise].notes || '',
+                        complementary: oldData[exercise].complementary || [],
+                        videoData: null
+                    };
+                } else {
+                    data[exercise] = oldData[exercise];
+                }
+            }
+        }
+        
+        // Mostra stato salvataggio
+        function showStorageStatus() {
+            const statusElement = document.getElementById('storage-status');
+            if (statusElement && storageAvailable) {
+                statusElement.innerHTML = '<span style="color: #10b981;">✅ Salvataggio automatico attivo</span>';
+                // Nascondi dopo 3 secondi sul sito reale
+                if (window.location.hostname !== 'claude.ai') {
+                    setTimeout(() => {
+                        statusElement.style.display = 'none';
+                    }, 3000);
+                }
+            }
+        }
+        
+        // Mostra avviso storage
+        function showStorageWarning() {
+            const statusElement = document.getElementById('storage-status');
+            if (statusElement) {
+                statusElement.innerHTML = '<span style="color: #f59e0b;">⚠️ Modalità offline - Usa "Esporta Backup" per salvare permanentemente</span>';
+            }
+        }
+        
+        // Salva dati
+        function saveData() {
+            if (storageAvailable) {
+                try {
+                    localStorage.setItem('strengthData', JSON.stringify(data));
+                    // Mostra brevemente che il salvataggio è avvenuto
+                    const statusElement = document.getElementById('storage-status');
+                    if (statusElement) {
+                        const originalText = statusElement.innerHTML;
+                        statusElement.innerHTML = '<span style="color: #10b981;">💾 Salvato!</span>';
+                        setTimeout(() => {
+                            statusElement.innerHTML = originalText;
+                        }, 1000);
+                    }
+                    return true;
+                } catch (e) {
+                    console.log('Errore nel salvataggio:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
+        
+        // Seleziona esercizio
+        function selectExercise(exercise) {
+            currentExercise = exercise;
+            
+            // Aggiorna tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent === exercise) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            updateUI();
+        }
+        
+        // Aggiorna video
+        function updateVideo() {
+            const video = document.getElementById('exercise-video');
+            const videoUrl = exerciseVideos[currentExercise];
+            
+            if (videoUrl) {
+                video.src = videoUrl;
+            }
+        }
+        
+        // Aggiungi test massimale
+        function addMaxTest() {
+            const weight = parseFloat(document.getElementById('max-input').value);
+            const date = document.getElementById('max-date').value;
+            
+            if (weight && date) {
+                data[currentExercise].maxTests.push({
+                    weight: weight,
+                    date: date
+                });
+                
+                // Ordina per data decrescente
+                data[currentExercise].maxTests.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                saveData();
+                
+                // Reset form
+                document.getElementById('max-input').value = '';
+                document.getElementById('max-date').value = new Date().toISOString().split('T')[0];
+                
+                updateUI();
+            }
+        }
+        
+        // Elimina test massimale
+        function deleteMaxTest(index) {
+            data[currentExercise].maxTests.splice(index, 1);
+            saveData();
+            updateUI();
+        }
+        
+        // Aggiungi sessione
+        function addSession() {
+            const weight = parseFloat(document.getElementById('session-weight').value);
+            const sets = parseInt(document.getElementById('session-sets').value);
+            const reps = parseInt(document.getElementById('session-reps').value);
+            const date = document.getElementById('session-date').value;
+            const notes = document.getElementById('notes').value.trim();
+            
+            if (weight && sets && reps && date) {
+                const session = {
+                    date: date,
+                    weight: weight,
+                    sets: sets,
+                    reps: reps,
+                    volume: weight * sets * reps,
+                    notes: notes
+                };
+                
+                data[currentExercise].sessions.push(session);
+                saveData();
+                
+                // Reset form
+                document.getElementById('session-weight').value = '';
+                document.getElementById('session-sets').value = '';
+                document.getElementById('session-reps').value = '';
+                document.getElementById('session-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('notes').value = '';
+                
+                updateUI();
+                
+                // Promemoria backup se localStorage non disponibile
+                if (!storageAvailable && data[currentExercise].sessions.length % 5 === 0) {
+                    if (confirm('Hai aggiunto 5 sessioni! Vuoi fare un backup ora?')) {
+                        exportData();
+                    }
+                }
+            }
+        }
+        
+        // Elimina sessione
+        function deleteSession(index) {
+            data[currentExercise].sessions.splice(index, 1);
+            saveData();
+            updateUI();
+        }
+        
+        // Aggiorna note
+        function updateNotes() {
+            data[currentExercise].notes = document.getElementById('notes').value;
+            saveData();
+        }
+        
+        // Aggiungi esercizio complementare
+        function addComplementary() {
+            const name = document.getElementById('complementary-name').value.trim();
+            const sets = parseInt(document.getElementById('complementary-sets').value);
+            const reps = parseInt(document.getElementById('complementary-reps').value);
+            
+            if (name && sets && reps) {
+                data[currentExercise].complementary.push({
+                    name: name,
+                    sets: sets,
+                    reps: reps
+                });
+                saveData();
+                
+                // Reset form
+                document.getElementById('complementary-name').value = '';
+                document.getElementById('complementary-sets').value = '';
+                document.getElementById('complementary-reps').value = '';
+                
+                updateComplementaryList();
+            }
+        }
+        
+        // Elimina esercizio complementare
+        function deleteComplementary(index) {
+            data[currentExercise].complementary.splice(index, 1);
+            saveData();
+            updateComplementaryList();
+        }
+        
+        // Aggiorna UI
+        function updateUI() {
+            const currentData = data[currentExercise];
+            
+            // Aggiorna video
+            updateVideo();
+            
+            // Aggiorna descrizione esercizio
+            const descriptionElement = document.getElementById('exercise-description');
+            if (descriptionElement && exerciseDescriptions[currentExercise]) {
+                descriptionElement.textContent = exerciseDescriptions[currentExercise];
+            }
+            
+            // Reset notes input
+            document.getElementById('notes').value = '';
+            
+            // Aggiorna liste e recap
+            updateMaxList();
+            updateSessionList();
+            updateComplementaryList();
+            updateRecap();
+            updateChart();
+        }
+        
+        // Aggiorna lista massimali
+        function updateMaxList() {
+            const list = document.getElementById('max-list');
+            const maxTests = data[currentExercise].maxTests || [];
+            
+            if (maxTests.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6b7280; font-size: 14px;">Nessun test registrato</p>';
+            } else {
+                list.innerHTML = maxTests.map((test, idx) => `
+                    <div class="max-item">
+                        <div>
+                            <div class="max-date">${test.date}</div>
+                            <div class="max-weight">${test.weight} kg</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteMaxTest(${idx})">✕</button>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Aggiorna lista sessioni
+        function updateSessionList() {
+            const list = document.getElementById('session-list');
+            const sessions = data[currentExercise].sessions;
+            
+            if (sessions.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6b7280;">Nessuna sessione registrata</p>';
+            } else {
+                list.innerHTML = sessions.map((session, idx) => `
+                    <div class="session-item">
+                        <div class="session-info">
+                            <div class="session-date">${session.date}</div>
+                            <div class="session-details">
+                                ${session.weight}kg × ${session.sets}×${session.reps} = ${session.volume}kg
+                            </div>
+                            ${session.notes ? `<div class="session-notes" style="margin-top: 8px; font-size: 14px; color: #4b5563;">📝 ${session.notes}</div>` : ''}
+                        </div>
+                        <button class="delete-btn" onclick="deleteSession(${idx})">✕</button>
+                    </div>
+                `).reverse().join('');
+            }
+        }
+        
+        // Aggiorna lista complementari
+        function updateComplementaryList() {
+            const list = document.getElementById('complementary-list');
+            const complementary = data[currentExercise].complementary;
+            
+            if (complementary.length === 0) {
+                list.innerHTML = '';
+            } else {
+                list.innerHTML = complementary.map((ex, idx) => `
+                    <div class="complementary-item">
+                        <div class="complementary-header">
+                            <span class="complementary-name">${ex.name}</span>
+                            <button class="btn-red" onclick="deleteComplementary(${idx})">✕</button>
+                        </div>
+                        <div class="complementary-details">
+                            <span>Serie: ${ex.sets}</span>
+                            <span>Reps: ${ex.reps}</span>
+                            <span>Volume: ${ex.sets}×${ex.reps}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Aggiorna recap
+        function updateRecap() {
+            const currentData = data[currentExercise];
+            const sessions = currentData.sessions;
+            const maxTests = currentData.maxTests || [];
+            
+            // Calcola statistiche
+            const totalSessions = sessions.length;
+            const lastSession = sessions[sessions.length - 1];
+            const avgVolume = sessions.length > 0 
+                ? sessions.reduce((sum, s) => sum + s.volume, 0) / sessions.length 
+                : 0;
+            const maxWeight = sessions.length > 0 
+                ? Math.max(...sessions.map(s => s.weight)) 
+                : 0;
+            
+            // Ottieni massimale più recente
+            const currentMax = maxTests.length > 0 ? maxTests[0].weight : 0;
+            const maxPercentage = currentMax > 0 
+                ? (maxWeight / currentMax * 100).toFixed(1) 
+                : 0;
+            
+            // Aggiorna DOM
+            document.getElementById('total-sessions').textContent = totalSessions;
+            document.getElementById('last-session').textContent = lastSession 
+                ? `${lastSession.weight}kg x ${lastSession.sets}x${lastSession.reps}` 
+                : 'N/A';
+            document.getElementById('avg-volume').textContent = `${avgVolume.toFixed(0)} kg`;
+            document.getElementById('max-weight').textContent = `${maxWeight} kg`;
+            document.getElementById('max-percentage').textContent = `${maxPercentage}%`;
+        }
+        
+        // Aggiorna grafico
+        function updateChart() {
+            const sessions = data[currentExercise].sessions;
+            const chartCard = document.getElementById('chart-card');
+            
+            if (sessions.length < 2) {
+                // Non mostrare il grafico se ci sono meno di 2 punti
+                chartCard.style.display = 'none';
+                return;
+            }
+            
+            chartCard.style.display = 'block';
+            
+            const canvas = document.getElementById('chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Dimensioni canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 250;
+            
+            // Ordina sessioni per data
+            const sortedSessions = [...sessions].sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Dati per il grafico
+            const dates = sortedSessions.map(s => s.date.split('-').slice(1).join('/'));
+            const weights = sortedSessions.map(s => s.weight);
+            
+            const maxY = Math.max(...weights) * 1.1;
+            const minY = Math.min(...weights) * 0.9;
+            
+            // Pulisci canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Margini
+            const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+            const width = canvas.width - margin.left - margin.right;
+            const height = canvas.height - margin.top - margin.bottom;
+            
+            // Disegna assi
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            // Asse Y
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top);
+            ctx.lineTo(margin.left, margin.top + height);
+            ctx.stroke();
+            
+            // Asse X
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top + height);
+            ctx.lineTo(margin.left + width, margin.top + height);
+            ctx.stroke();
+            
+            // Etichette Y
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'right';
+            
+            const ySteps = 5;
+            for (let i = 0; i <= ySteps; i++) {
+                const y = margin.top + height - (i * height / ySteps);
+                const value = minY + (maxY - minY) * i / ySteps;
+                ctx.fillText(value.toFixed(0) + 'kg', margin.left - 10, y + 5);
+                
+                // Griglia
+                if (i > 0 && i < ySteps) {
+                    ctx.strokeStyle = '#f3f4f6';
+                    ctx.beginPath();
+                    ctx.moveTo(margin.left, y);
+                    ctx.lineTo(margin.left + width, y);
+                    ctx.stroke();
+                }
+            }
+            
+            // Disegna linea con gradiente
+            const gradient = ctx.createLinearGradient(0, margin.top, 0, margin.top + height);
+            gradient.addColorStop(0, '#3b82f6');
+            gradient.addColorStop(1, '#60a5fa');
+            
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            weights.forEach((weight, i) => {
+                const x = margin.left + (i * width / (weights.length - 1));
+                const y = margin.top + height - ((weight - minY) / (maxY - minY) * height);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+            
+            // Area sotto la linea
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top + height);
+            
+            weights.forEach((weight, i) => {
+                const x = margin.left + (i * width / (weights.length - 1));
+                const y = margin.top + height - ((weight - minY) / (maxY - minY) * height);
+                ctx.lineTo(x, y);
+            });
+            
+            ctx.lineTo(margin.left + width, margin.top + height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Disegna punti
+            ctx.fillStyle = '#3b82f6';
+            weights.forEach((weight, i) => {
+                const x = margin.left + (i * width / (weights.length - 1));
+                const y = margin.top + height - ((weight - minY) / (maxY - minY) * height);
+                
+                // Punto esterno
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Punto interno bianco
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#3b82f6';
+            });
+            
+            // Etichette X (solo alcune per non sovrapporre)
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            
+            const step = Math.ceil(dates.length / 6);
+            dates.forEach((date, i) => {
+                if (i % step === 0 || i === dates.length - 1) {
+                    const x = margin.left + (i * width / (dates.length - 1));
+                    ctx.fillText(date, x, margin.top + height + 20);
+                }
+            });
+            
+            // Linea di tendenza
+            if (weights.length > 2) {
+                const trend = calculateTrendLine(weights);
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                
+                for (let i = 0; i < weights.length; i++) {
+                    const x = margin.left + (i * width / (weights.length - 1));
+                    const trendValue = trend.slope * i + trend.intercept;
+                    const y = margin.top + height - ((trendValue - minY) / (maxY - minY) * height);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        
+        // Calcola linea di tendenza
+        function calculateTrendLine(values) {
+            const n = values.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            
+            for (let i = 0; i < n; i++) {
+                sumX += i;
+                sumY += values[i];
+                sumXY += i * values[i];
+                sumX2 += i * i;
+            }
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            return { slope, intercept };
+        }
+        
+        // Esporta dati
+        function exportData() {
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const exportFileDefaultName = `strength-backup-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            // Se localStorage non è disponibile, ricorda all'utente di salvare
+            if (!storageAvailable) {
+                setTimeout(() => {
+                    alert('Backup scaricato! Ricorda di importarlo la prossima volta che usi l\'app.');
+                }, 500);
+            }
+        }
+        
+        // Importa dati
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        migrateOldData(importedData);
+                        saveData();
+                        updateUI();
+                        alert('Dati importati con successo!');
+                    } catch (error) {
+                        alert('Errore nell\'importazione dei dati');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+        
+        // Funzioni admin
+        function toggleAdmin() {
+            const adminSection = document.getElementById('admin-section');
+            adminSection.classList.toggle('active');
+        }
+
+        function checkAdminPassword() {
+            if (currentUser && currentUser.role === 'admin') {
+                document.getElementById('video-management').style.display = 'block';
+                document.getElementById('admin-password').style.display = 'none';
+                document.querySelector('#admin-section button[onclick="checkAdminPassword()"]').style.display = 'none';
+                document.getElementById('video-panca').value = exerciseVideos['Panca'];
+                document.getElementById('video-stacco').value = exerciseVideos['Stacco'];
+                document.getElementById('video-squat').value = exerciseVideos['Squat'];
+                document.getElementById('video-military').value = exerciseVideos['Military Press'];
+            } else {
+                alert('Non sei autorizzato');
+            }
+        }
+
+        function saveVideoUrl(exercise) {
+            const inputId = `video-${exercise.toLowerCase().replace(' ', '-')}`;
+            const newUrl = document.getElementById(inputId).value;
+            
+            // Verifica che l'URL sia un URL di YouTube valido
+            if (newUrl.includes('youtube.com') || newUrl.includes('youtu.be')) {
+                // Converti l'URL in formato embed
+                let embedUrl = newUrl;
+                if (newUrl.includes('watch?v=')) {
+                    embedUrl = newUrl.replace('watch?v=', 'embed/');
+                } else if (newUrl.includes('youtu.be/')) {
+                    embedUrl = newUrl.replace('youtu.be/', 'youtube.com/embed/');
+                }
+                
+                exerciseVideos[exercise] = embedUrl;
+                updateVideo();
+                alert('URL video aggiornato con successo!');
+            } else {
+                alert('Inserisci un URL di YouTube valido');
+            }
+        }
+        
+        // --- LOGIN SYSTEM ---
+        const USERS = [
+            { username: 'admin', password: 'admin123', role: 'admin' },
+            { username: 'user', password: 'user123', role: 'user' }
+        ];
+        let currentUser = null;
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('login-password');
+            const toggleButton = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = '👁️‍🗨️';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = '👁️';
+            }
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const user = USERS.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('loggedUser', JSON.stringify(user));
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('app-root').style.display = 'block';
+                showOrHideAdmin();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedUser');
+            location.reload();
+        }
+
+        function showOrHideAdmin() {
+            // Mostra/nasconde il pulsante admin e la sezione admin
+            const adminBtn = document.querySelector('.btn.btn-blue[onclick="toggleAdmin()"]');
+            if (currentUser && currentUser.role === 'admin') {
+                if (adminBtn) adminBtn.style.display = '';
+            } else {
+                if (adminBtn) adminBtn.style.display = 'none';
+                document.getElementById('admin-section').classList.remove('active');
+            }
+        }
+
+        // All'avvio, controlla se c'è un utente loggato
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('loggedUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('app-root').style.display = 'block';
+                showOrHideAdmin();
+            } else {
+                document.getElementById('login-overlay').style.display = 'flex';
+                document.getElementById('app-root').style.display = 'none';
+            }
+        });
+        
+        // Avvia l'app
+        init();
+    </script>
+     <script src="api-sync.js"></script>
+</body>
+</html>
